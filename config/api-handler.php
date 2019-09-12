@@ -11,10 +11,12 @@ include_once 'db-config.php';
     1. 11 September 2019
 
         Customer
-      -customerRegister(),customerLogin()
-
+      - customerRegister()
         Vendor
-      -vendorRegister()
+      - vendorRegister()
+    2. 12 September 2019
+      Customer
+      - customerLogin()
 */
 class apihandler extends database{
 
@@ -52,8 +54,51 @@ class apihandler extends database{
   }
 
   // Customer Login
-  public function customerLogin(){
+  public function customerLogin($username,$password){
 
+    $result = $this->koneksi->query("SELECT * FROM tbl_userLogin WHERE username='$username' AND password='$password'");
+
+    if($result == false){
+        return false;
+    }
+        if ($num_row = $result->num_rows > 0) {
+
+            $data = $result->fetch_array();
+            if($data['userLevel'] == "Customer"){
+
+              $resultData = array(
+                "idCustomer" => $data['id_login'],
+                "username"   => $data['username'],
+                "level"      => $data['userLevel']
+              );
+
+              $response = json_encode(
+                  array(
+                      "Message"  => "Login Berhasil",
+                      "Success"  => "1",
+                      "UserLevel"=> "Customer",
+                      "Result"   => $resultData,
+                  ));
+            }else{
+              $response = json_encode(
+                  array(
+                      "Message" => "Anda Melakukan Login Dengan Akun Vendor",
+                      "Success" => "0",
+                      "UserLevel"=> "NULL",
+                      "Result"   => array(),
+                  ));
+            }
+
+        }else{
+          $response = json_encode(
+              array(
+                  "Message" => "Username Belum Terdaftar",
+                  "Success" => "0",
+                  "UserLevel"=> "NULL",
+                  "Result"   => array(),
+              ));
+        }
+    return $response;
   }
 
   /* ==================================================================
