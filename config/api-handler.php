@@ -19,6 +19,9 @@ include_once 'db-config.php';
       - customerLogin()
       Vendor
       - vendorLogin()
+    3. 13 September 2019
+      - Data user
+        membuat function untuk parsing data dari user yang Berdasarkan $id_user
 
 */
 class apihandler extends database{
@@ -179,5 +182,20 @@ class apihandler extends database{
               ));
         }
     return $response;
+  }
+
+  /* ==================================================================
+  *  Vendor & Customer Data Handler
+  *  ==================================================================
+  */
+
+  // vendor Data
+  public function userData($id_data,$firstName,$lastName,$birth,$gender,$phone,$profilePhoto,$id_user){
+
+  }
+
+  // Vendor Region
+  public function regionData($id_region,$wilayah1,$wilayah2,$wilayah3,$wilayah4,$address,$postalcode,$id_user){
+
   }
 }
