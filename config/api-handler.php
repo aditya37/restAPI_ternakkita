@@ -17,6 +17,9 @@ include_once 'db-config.php';
     2. 12 September 2019
       Customer
       - customerLogin()
+      Vendor
+      - vendorLogin()
+
 */
 class apihandler extends database{
 
@@ -105,6 +108,8 @@ class apihandler extends database{
   *  Vendor Handler
   *  ==================================================================
   */
+
+  //Vendor Register
   public function vendorRegister($id,$username,$password,$userLevel,$date){
     // Query Data Berdasarkan Username
         $check_user = $this->koneksi->query("SELECT * FROM tbl_userLogin WHERE username=$username");
@@ -126,5 +131,53 @@ class apihandler extends database{
                     ));
         }
    return $response;
+  }
+
+  // Vendor login
+  public function vendorLogin($username,$password){
+
+    $result = $this->koneksi->query("SELECT * FROM tbl_userLogin WHERE username='$username' AND password='$password'");
+
+    if($result == false){
+        return false;
+    }
+        if ($num_row = $result->num_rows > 0) {
+
+            $data = $result->fetch_array();
+            if($data['userLevel'] == "Vendor"){
+
+              $resultData = array(
+                "idCustomer" => $data['id_login'],
+                "username"   => $data['username'],
+                "level"      => $data['userLevel']
+              );
+
+              $response = json_encode(
+                  array(
+                      "Message"  => "Login Berhasil",
+                      "Success"  => "1",
+                      "UserLevel"=> "Vendor",
+                      "Result"   => $resultData,
+                  ));
+            }else{
+              $response = json_encode(
+                  array(
+                      "Message" => "Anda Melakukan Login Dengan Akun Vendor",
+                      "Success" => "0",
+                      "UserLevel"=> "NULL",
+                      "Result"   => array(),
+                  ));
+            }
+
+        }else{
+          $response = json_encode(
+              array(
+                  "Message" => "Username Belum Terdaftar",
+                  "Success" => "0",
+                  "UserLevel"=> "NULL",
+                  "Result"   => array(),
+              ));
+        }
+    return $response;
   }
 }

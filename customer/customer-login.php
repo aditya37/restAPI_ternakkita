@@ -20,5 +20,3 @@ include_once("../config/api-handler.php");
         ));
         echo $response;
   }
-
-?>
