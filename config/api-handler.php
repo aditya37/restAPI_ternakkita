@@ -38,7 +38,7 @@ class apihandler extends database{
   // Customer Register
   public function customerRegister($id,$username,$password,$userLevel,$date){
     // Query Data Berdasarkan Username
-        $check_user = $this->koneksi->query("SELECT * FROM tbl_userLogin WHERE username=$username");
+        $check_user = $this->koneksi->query("SELECT * FROM tbl_userLogin WHERE username='$username'");
     // Mengecek Apakah Username yang Diinputkan Apakah Sudah terdaftar apa belum
         if($num_row = $check_user->num_rows > 0){
     // Parsing Data Ke Dalam Format JSON --- Start ---
@@ -53,7 +53,9 @@ class apihandler extends database{
           $response = json_encode(array(
                         "Message" => "Berhasil Terdaftar",
                         "Success" => "1",
-                        "Result"   => array(),
+                        "Result"  => array(
+                          "idLogin" => $id,
+                        ),
                     ));
         }
    return $response;
@@ -115,7 +117,7 @@ class apihandler extends database{
   //Vendor Register
   public function vendorRegister($id,$username,$password,$userLevel,$date){
     // Query Data Berdasarkan Username
-        $check_user = $this->koneksi->query("SELECT * FROM tbl_userLogin WHERE username=$username");
+        $check_user = $this->koneksi->query("SELECT * FROM tbl_userLogin WHERE username='$username'");
     // Mengecek Apakah Username yang Diinputkan Apakah Sudah terdaftar apa belum
         if($num_row = $check_user->num_rows > 0){
     // Parsing Data Ke Dalam Format JSON --- Start ---
@@ -147,6 +149,7 @@ class apihandler extends database{
         if ($num_row = $result->num_rows > 0) {
 
             $data = $result->fetch_array();
+
             if($data['userLevel'] == "Vendor"){
 
               $resultData = array(
@@ -162,11 +165,11 @@ class apihandler extends database{
                       "UserLevel"=> "Vendor",
                       "Result"   => $resultData,
                   ));
-            }else{
+            }elseif($data['userLevel'] == "Customer"){
               $response = json_encode(
                   array(
-                      "Message" => "Anda Melakukan Login Dengan Akun Vendor",
-                      "Success" => "0",
+                      "Message"  => "User Terdaftar Sebagai Customer",
+                      "Success"  => "0",
                       "UserLevel"=> "NULL",
                       "Result"   => array(),
                   ));
@@ -191,7 +194,32 @@ class apihandler extends database{
 
   // vendor Data
   public function userData($id_data,$firstName,$lastName,$birth,$gender,$phone,$profilePhoto,$id_user){
+      $checkData = $this->koneksi->query("SELECT * FROM tbl_userData WHERE id_login='$id_user'");
 
+      if($checkData == false){
+        return false;
+      }
+
+        if($num_row = $checkData->num_rows > 0){
+          // check Apakah Sudah mengisi data diri
+              $response = json_encode(array(
+                              "Message" => "Data Diri Sudah Terisi",
+                              "Success" => "0",
+                              "Result"   => array(),
+                          ));
+        }else{
+
+          // jika data diri masih kosong maka perintah insert data di eksekusi
+          $insert_data = $this->koneksi->query("INSERT INTO tbl_userData VALUES ('$id_data','$firstName','$lastName','$birth','$gender','$phone','$lokasi','$id_user')");
+          // respone jika sudah Berhasi input data
+          $response = json_encode(array(
+                        "Message" => "Berhasi",
+                        "Success" => "1",
+                        "Result"   => array(),
+                    ));
+        }
+
+  return $response;
   }
 
   // Vendor Region
