@@ -210,7 +210,7 @@ class apihandler extends database{
         }else{
 
           // jika data diri masih kosong maka perintah insert data di eksekusi
-          $insert_data = $this->koneksi->query("INSERT INTO tbl_userData VALUES ('$id_data','$firstName','$lastName','$birth','$gender','$phone','$lokasi','$id_user')");
+          $insert_data = $this->koneksi->query("INSERT INTO tbl_userData VALUES ('$id_data','$firstName','$lastName','$birth','$gender','$phone','$profilePhoto','$id_user')");
           // respone jika sudah Berhasi input data
           $response = json_encode(array(
                         "Message" => "Berhasi",

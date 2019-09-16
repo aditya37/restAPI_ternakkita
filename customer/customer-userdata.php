@@ -14,11 +14,18 @@ include_once("../config/api-handler.php");
         'id_login'  => $_POST['id_login']
       );
 
-      $idData = acak(16);
       $api      = new apihandler();
-      $register = $api->userData($idData,$data['firstName'],$data['lastName'],$data['birth'],$data['gender'],$data['phone'],$actualpath,$data['id_login']);
-      var_dump($register);
 
+      // Encode atau convert ke gambar
+      $random = acak(20);
+      $path = "photo/".$random.".png";
+      $actualpath = "http://192.168.0.133/api.ternakkita/customer/$path";
+
+      $idData = acak(16);
+      $register = $api->userData($idData,$data['firstName'],$data['lastName'],$data['birth'],$data['gender'],$data['phone'],$actualpath,$data['id_login']);
+      file_put_contents($path,base64_decode($data['photo']));
+      var_dump($register);
+      
   }else{
     echo json_encode(array("message" => "Field Masih Ada Yang Kosong"));
   }
@@ -32,5 +39,4 @@ include_once("../config/api-handler.php");
       }
       return $string;
   }
-
 ?>
