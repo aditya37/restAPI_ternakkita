@@ -3,6 +3,9 @@ header('Content-Type: application/json');
 include_once("../config/api-handler.php");
 
   if(isset($_POST['firstName'])){
+      $file_path = "photo/";
+
+      $api      = new apihandler();
 
       $data = array(
         'firstName' => $_POST['firstName'],
@@ -10,24 +13,20 @@ include_once("../config/api-handler.php");
         'birth'     => $_POST['birth'],
         'gender'    => $_POST['gender'],
         'phone'     => $_POST['phone'],
-        'photo'     => $_POST['photo'],
+        'imgFrmDevice'=> $_POST['locationImg'],
         'id_login'  => $_POST['id_login']
       );
-
-      $api      = new apihandler();
-
-      // Encode atau convert ke gambar
-      $random = acak(20);
-      $path = "photo/".$random.".png";
-      $actualpath = "http://192.168.0.133/api.ternakkita/customer/$path";
-
-      $idData = acak(16);
-      $register = $api->userData($idData,$data['firstName'],$data['lastName'],$data['birth'],$data['gender'],$data['phone'],$actualpath,$data['id_login']);
-      file_put_contents($path,base64_decode($data['photo']));
-      var_dump($register);
-      
+        $file_path = $file_path . basename($_FILES['uploaded_file']['name']);
+        if(move_uploaded_file($_FILES['uploaded_file']['tmp_name'], $file_path)) {
+          $idData = acak(16);
+          $register = $api->userData($idData,$data['firstName'],$data['lastName'],$data['birth'],$data['gender'],$data['phone'],$data['imgFrmDevice'],"customer/".$file_path,$data['id_login']);
+          print_r($register);
+          
+        }else{
+          $response = json_encode(array("message" => "Gagal Upload","success" => "0","result" => array()));
+        }
   }else{
-    echo json_encode(array("message" => "Field Masih Ada Yang Kosong"));
+    $response = json_encode(array("message" => "Field Kosong","success" => "0","result"   => array()));
   }
 
   function acak($panjang){

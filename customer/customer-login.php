@@ -16,7 +16,7 @@ include_once("../config/api-handler.php");
             "Message" => "Masih Ada Field Yang Kosong",
             "Success" => "0",
             "UserLevel"=> "NULL",
-            "Result"   => array(),
+            "User"   => array(),
         ));
         echo $response;
   }
