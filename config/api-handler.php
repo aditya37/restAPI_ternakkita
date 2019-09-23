@@ -216,7 +216,7 @@ class apihandler extends database{
                         "success" => "1"));
         }
 
-  return $response;
+        return $response;
   }
 
   // Vendor Region
@@ -246,4 +246,80 @@ class apihandler extends database{
 
     return $response;
   }
+
+  /* ==================================================================
+  *  Product Handler
+  *  ==================================================================
+  */
+
+  // Insert Product
+  public function productAdd($idProduct,$productTitle,$productCreate,$productUpdate,$productStatus,$idVendor){
+
+      $queryProduct = $this->koneksi->query("SELECT * FROM tbl_product");
+
+      if($queryProduct == false){
+        return false;
+
+        if ($num_row = $queryProduct->num_rows > 0) {
+              $response = json_encode({
+                "message" => "Product Masih Kosong",
+                "success" => "0",
+              });
+        }else{
+        $addProduct = $this->koneksi->query("INSERT INTO tbl_product VALUES ('$idProduct','$productTitle','$productCreate','$productUpdate','$productStatus','$idVendor')");
+              $response = json_encode({
+                "message" => "Product Berhasil Di Tambah",
+                "success" => "1",
+                "result"  => array(
+                  "id_product" => $idProduct
+                )
+              });
+        }
+        return $response;
+  }
+
+  // Insert Product Detail
+  public function productDetail($idDetail,$gender,$type,$weight,$price,$desc,$note,$age,$image,$idProduct){
+    $qryProduct = $this->koneksi->query("SELECT * FROM tbl_detailProduct");
+
+      if($qryProduct == false){
+        return false;
+
+        if ($num_row = $qryProduct->num_rows > 0) {
+              $response = json_encode({
+                "message" => "Detail Product Masih Kosong",
+                "success" => "0",
+              });
+        }else{
+        $addProduct = $this->koneksi->query("INSERT INTO tbl_detailProduct VALUES ('$idDetail','$gender','$type','$weight','$price','$desc','$note','$age','$image','$idProduct')");
+              $response = json_encode({
+                "message" => "Detail Product Berhasil Di Tambah",
+                "success" => "1"
+              });
+        }
+        return $response;
+  }
+
+  // Get Product
+  public function getallProduct(){
+      return $response;
+  }
+
+  // Get Product Order By ID
+  public function getProductId($idProduct){
+    return $response;
+  }
+
+
+  /* ==================================================================
+  *  Transaction Handler
+  *  ==================================================================
+  */
+
+  // Insert Transaction
+  public function addTransaction(){
+
+  }
+
+
 }
