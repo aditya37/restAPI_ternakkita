@@ -252,65 +252,178 @@ class apihandler extends database{
   *  ==================================================================
   */
 
-  // Insert Product
-  public function productAdd($idProduct,$productTitle,$productCreate,$productUpdate,$productStatus,$idVendor){
-
-      $queryProduct = $this->koneksi->query("SELECT * FROM tbl_product");
+  // Get Product
+  public function getallProduct(){
+    $queryProduct = $this->koneksi->query("SELECT tbl_product.idProduct,
+      tbl_product.productTittle,
+      tbl_userData.firstName,
+      tbl_userRegion.administrative_area_level_1,
+      tbl_detailProduct.price,
+      tbl_detailProduct.image
+      FROM
+      tbl_product,
+      tbl_userData,
+      tbl_userRegion,
+      tbl_detailProduct
+      WHERE tbl_product.id_login = tbl_userData.id_login AND
+      tbl_product.idProduct = tbl_detailProduct.idProduct");
 
       if($queryProduct == false){
         return false;
+      }
+          if ($num_row = $queryProduct->num_rows > 0) {
+            $response = array(
+              "success" => "1",
+              "message" => "Berhasil",
+              "jumlah_product" => $num_row,
+              "produk"  => array(
+                "detail_produk" => array(),
+                "vendor"        => array(),
+              ));
 
-        if ($num_row = $queryProduct->num_rows > 0) {
-              $response = json_encode({
-                "message" => "Product Masih Kosong",
-                "success" => "0",
-              });
-        }else{
-        $addProduct = $this->koneksi->query("INSERT INTO tbl_product VALUES ('$idProduct','$productTitle','$productCreate','$productUpdate','$productStatus','$idVendor')");
-              $response = json_encode({
-                "message" => "Product Berhasil Di Tambah",
-                "success" => "1",
-                "result"  => array(
-                  "id_product" => $idProduct
-                )
-              });
-        }
-        return $response;
+            while($data = $queryProduct->fetch_array()){
+              $h['idProduct'] = $data['idProduct'];
+              $h['judul'] = $data['productTittle'];
+              $h['harga'] = $data['price'];
+              $h['provinsi'] = $data['administrative_area_level_1'];
+              $h['peternak'] = $data['firstName'];
+              $h['thumbnail'] = $data['image'];
+              array_push($response['produk']['detail_produk'],$h);
+            }
+          }else{
+            $response = json_encode(array(
+              "success" => "0",
+              "message" => "Produk Masih Kosong"
+            ));
+          }
+      return json_encode($response);
   }
 
-  // Insert Product Detail
-  public function productDetail($idDetail,$gender,$type,$weight,$price,$desc,$note,$age,$image,$idProduct){
-    $qryProduct = $this->koneksi->query("SELECT * FROM tbl_detailProduct");
+  // insert Product
+  public function addProduct($idProduct,$judul,$dateCreate,$dateUpdate,$status,$id_login){
+    $query = $this->koneksi->query("SELECT * FROM tbl_product WHERE productTittle='$judul'");
 
-      if($qryProduct == false){
-        return false;
-
-        if ($num_row = $qryProduct->num_rows > 0) {
-              $response = json_encode({
-                "message" => "Detail Product Masih Kosong",
-                "success" => "0",
-              });
-        }else{
-        $addProduct = $this->koneksi->query("INSERT INTO tbl_detailProduct VALUES ('$idDetail','$gender','$type','$weight','$price','$desc','$note','$age','$image','$idProduct')");
-              $response = json_encode({
-                "message" => "Detail Product Berhasil Di Tambah",
-                "success" => "1"
-              });
-        }
-        return $response;
-  }
-
-  // Get Product
-  public function getallProduct(){
+    if($query == false){
+      return false;
+    }
+      if($row = $query->num_rows > 0){
+        $response = json_encode(array(
+          "message" => "Judul Sudah Ada",
+          "success" => "0",
+        ));
+      }else{
+        $add = $this->koneksi->query("INSERT INTO tbl_product VALUES ('$idProduct','$judul','$dateCreate','$dateUpdate','$status','$id_login')");
+        $response = json_encode(array(
+          "message" => "Tambah Produk Berhasil",
+          "success" => "1",
+          "produk"  => array("idProduct" => $idProduct),
+        ));
+      }
       return $response;
   }
+  // insert Product detail
+  public function addProductDetail($id_detailP,$gender,$type,$weight,$price,$description,$note,$age,$image,$idProduct){
 
-  // Get Product Order By ID
-  public function getProductId($idProduct){
+      $query = $this->koneksi->query("SELECT idProduct FROM tbl_product WHERE idProduct='$idProduct'");
+
+      if($query == false){
+        return false;
+      }
+
+      if($row = $query->num_rows > 0){
+        $add = $this->koneksi->query("INSERT INTO tbl_detailProduct VALUES ('$id_detailP',
+          '$gender',
+          '$type',
+          '$weight',
+          '$price',
+          '$description',
+          '$note',
+          '$age',
+          '$image',
+          '$idProduct')");
+
+        $response = json_encode(array(
+          "message" => "Berhasil",
+          "success" => "1",
+        ))
+        ;
+      }else{
+        $response = json_encode(array(
+          "message" => "Id Produk Tidak Diketahui",
+          "success" => "0",
+          "produk"  => array(),
+        ));
+      }
     return $response;
   }
 
+  /*get Product by ID
+  * function ini berfungsi untuk detail product
+  */
+  public function getProduct($idProduct){
+    $queryProduct = $this->koneksi->query("SELECT tbl_product.productTittle,
+          tbl_detailProduct.price,
+          tbl_detailProduct.image,
+          tbl_detailProduct.weight,
+          tbl_detailProduct.age,
+          tbl_detailProduct.note,
+          tbl_detailProduct.gender,
+          tbl_detailProduct.description,
+          tbl_userData.firstName,
+          tbl_userData.lastName,
+          tbl_userRegion.address,
+          tbl_userData.locationImg,
+          tbl_userLogin.id_login,
+          tbl_product.idProduct
+          FROM tbl_detailProduct,tbl_userData,tbl_userRegion,tbl_userLogin,tbl_product
+          WHERE tbl_product.id_login = tbl_userLogin.id_login
+          AND tbl_product.idProduct = tbl_detailProduct.idProduct
+          AND tbl_product.idProduct='$idProduct'");
 
+      if($queryProduct == false){
+        return false;
+      }
+          if ($num_row = $queryProduct->num_rows > 0) {
+
+            $response = array(
+              "success" => "1",
+              "message" => "Berhasil",
+              "produk"  => array(
+                "detail_produk" => array(),
+                "vendor"        => array(),
+              ));
+
+            while($data = $queryProduct->fetch_array()){
+              $produk['idProduct']   = $data['idProduct'];
+              $produk['judulProduk'] = $data['productTittle'];
+              $produk['harga']       = $data['price'];
+              $produk['thumbnail']   = $data['image'];
+              $produk['bobot']       = $data['weight'];
+              $produk['umur']        = $data['age'];
+              $produk['jenisKelamin']= $data['gender'];
+              $produk['deskripsi']   = $data['description'];
+              $produk['catatan']     = $data['note'];
+              array_push($response['produk']['detail_produk'],$produk);
+              // vendor area
+              $vendor['idLogin']     = $data['id_login'];
+              $vendor['firstName']   = $data['firstName'];
+              $vendor['lastName']    = $data['lastName'];
+              $vendor['alamat']      = $data['address'];
+              array_push($response['produk']['vendor'],$vendor);
+            }
+
+          }else{
+            $response = array(
+              "success" => "0",
+              "message" => "Produk Masih Kosong"
+            );
+          }
+      return json_encode($response);
+  }
+  // Delete Product
+  public function deleteProduct(){}
+  // update product
+  public function productUpdate(){}
   /* ==================================================================
   *  Transaction Handler
   *  ==================================================================
@@ -320,6 +433,5 @@ class apihandler extends database{
   public function addTransaction(){
 
   }
-
 
 }
