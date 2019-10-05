@@ -254,31 +254,30 @@ class apihandler extends database{
 
   // Get Product
   public function getallProduct(){
-    $queryProduct = $this->koneksi->query("SELECT tbl_product.idProduct,
-      tbl_product.productTittle,
-      tbl_userData.firstName,
-      tbl_userRegion.administrative_area_level_1,
-      tbl_detailProduct.price,
-      tbl_detailProduct.image
-      FROM
-      tbl_product,
-      tbl_userData,
-      tbl_userRegion,
-      tbl_detailProduct
-      WHERE tbl_product.id_login = tbl_userData.id_login AND
-      tbl_product.idProduct = tbl_detailProduct.idProduct");
+    $queryProduct = $this->koneksi->query("SELECT
+                tbl_product.idProduct,
+                tbl_product.productTittle,
+                tbl_userData.firstName,
+                tbl_userRegion.administrative_area_level_1,
+                tbl_detailProduct.price,
+                tbl_detailProduct.image
+                FROM tbl_product
+                INNER JOIN tbl_detailProduct USING (idProduct)
+                INNER JOIN tbl_userData USING (id_login)
+                INNER JOIN tbl_userRegion USING (id_login)
+                INNER JOIN tbl_userLogin USING (id_login)");
 
       if($queryProduct == false){
         return false;
       }
           if ($num_row = $queryProduct->num_rows > 0) {
+              $productCount = $this->koneksi->query("SELECT COUNT(idProduct) AS jumlah_product FROM tbl_product");
+              $count        = $productCount->fetch_array();
             $response = array(
               "success" => "1",
               "message" => "Berhasil",
-              "jumlah_product" => $num_row,
+              "jumlah_product" => $count['jumlah_product'],
               "produk"  => array(
-                "detail_produk" => array(),
-                "vendor"        => array(),
               ));
 
             while($data = $queryProduct->fetch_array()){
@@ -288,7 +287,7 @@ class apihandler extends database{
               $h['provinsi'] = $data['administrative_area_level_1'];
               $h['peternak'] = $data['firstName'];
               $h['thumbnail'] = $data['image'];
-              array_push($response['produk']['detail_produk'],$h);
+              array_push($response['produk'],$h);
             }
           }else{
             $response = json_encode(array(
@@ -361,24 +360,27 @@ class apihandler extends database{
   * function ini berfungsi untuk detail product
   */
   public function getProduct($idProduct){
-    $queryProduct = $this->koneksi->query("SELECT tbl_product.productTittle,
-          tbl_detailProduct.price,
-          tbl_detailProduct.image,
-          tbl_detailProduct.weight,
-          tbl_detailProduct.age,
-          tbl_detailProduct.note,
-          tbl_detailProduct.gender,
-          tbl_detailProduct.description,
-          tbl_userData.firstName,
-          tbl_userData.lastName,
-          tbl_userRegion.address,
-          tbl_userData.locationImg,
-          tbl_userLogin.id_login,
-          tbl_product.idProduct
-          FROM tbl_detailProduct,tbl_userData,tbl_userRegion,tbl_userLogin,tbl_product
-          WHERE tbl_product.id_login = tbl_userLogin.id_login
-          AND tbl_product.idProduct = tbl_detailProduct.idProduct
-          AND tbl_product.idProduct='$idProduct'");
+    $queryProduct = $this->koneksi->query("SELECT
+              tbl_product.idProduct,
+          		tbl_product.productTittle,
+          		tbl_userData.firstName,
+              tbl_userData.lastName,
+              tbl_userLogin.id_login,
+              tbl_userData.profilePhoto,
+          		tbl_userRegion.administrative_area_level_1,
+              tbl_userRegion.address,
+          		tbl_detailProduct.price,
+          		tbl_detailProduct.image,
+              tbl_detailProduct.weight,
+              tbl_detailProduct.gender,
+              tbl_detailProduct.age,
+              tbl_detailProduct.description,
+              tbl_detailProduct.note
+              FROM tbl_product
+              INNER JOIN tbl_detailProduct USING (idProduct)
+              INNER JOIN tbl_userData USING (id_login)
+              INNER JOIN tbl_userRegion USING (id_login)
+              INNER JOIN tbl_userLogin USING (id_login) WHERE tbl_product.idProduct = '$idProduct'");
 
       if($queryProduct == false){
         return false;
@@ -408,6 +410,7 @@ class apihandler extends database{
               $vendor['idLogin']     = $data['id_login'];
               $vendor['firstName']   = $data['firstName'];
               $vendor['lastName']    = $data['lastName'];
+              $vendor['imgProfile']  = $data['profilePhoto'];
               $vendor['alamat']      = $data['address'];
               array_push($response['produk']['vendor'],$vendor);
             }
