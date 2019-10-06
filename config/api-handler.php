@@ -258,6 +258,7 @@ class apihandler extends database{
                 tbl_product.idProduct,
                 tbl_product.productTittle,
                 tbl_userData.firstName,
+                tbl_product.productStatus,
                 tbl_userRegion.administrative_area_level_1,
                 tbl_detailProduct.price,
                 tbl_detailProduct.image
@@ -265,7 +266,7 @@ class apihandler extends database{
                 INNER JOIN tbl_detailProduct USING (idProduct)
                 INNER JOIN tbl_userData USING (id_login)
                 INNER JOIN tbl_userRegion USING (id_login)
-                INNER JOIN tbl_userLogin USING (id_login)");
+                INNER JOIN tbl_userLogin USING (id_login) WHERE tbl_product.productStatus='Available'");
 
       if($queryProduct == false){
         return false;
@@ -360,6 +361,7 @@ class apihandler extends database{
   * function ini berfungsi untuk detail product
   */
   public function getProduct($idProduct){
+
     $queryProduct = $this->koneksi->query("SELECT
               tbl_product.idProduct,
           		tbl_product.productTittle,
