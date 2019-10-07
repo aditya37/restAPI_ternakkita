@@ -10,8 +10,8 @@ include_once("../config/api-handler.php");
       $id        = acak(16);
 
       $api      = new apihandler();
-      $register = $api->customerRegister($id,$username,$password,"Vendor",$date);
-      print_r($register);
+      $register = $api->vendorRegister($id,$username,$password,$date);
+      print_r($register);    
   }else{
     echo json_encode(array("message" => "Field Masih Ada Yang Kosong"));
   }

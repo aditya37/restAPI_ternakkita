@@ -19,14 +19,16 @@ include_once("../config/api-handler.php");
         $file_path = $file_path . basename($_FILES['uploaded_file']['name']);
         if(move_uploaded_file($_FILES['uploaded_file']['tmp_name'], $file_path)) {
           $idData = acak(16);
-          $register = $api->userData($idData,$data['firstName'],$data['lastName'],$data['birth'],$data['gender'],$data['phone'],$data['imgFrmDevice'],"customer/".$file_path,$data['id_login']);
+          $register = $api->customerData($idData,$data['firstName'],$data['lastName'],$data['birth'],$data['gender'],$data['phone'],$data['imgFrmDevice'],"customer/".$file_path,$data['id_login']);
           print_r($register);
-          
+
         }else{
-          $response = json_encode(array("message" => "Gagal Upload","success" => "0","result" => array()));
+          $respone = json_encode(array("message" => "Gagal Upload","success" => "0","result" => array()));
+          echo $respone;
         }
   }else{
     $response = json_encode(array("message" => "Field Kosong","success" => "0","result"   => array()));
+    echo $respone;
   }
 
   function acak($panjang){

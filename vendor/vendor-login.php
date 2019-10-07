@@ -4,19 +4,19 @@ include_once("../config/api-handler.php");
 
   if(isset($_POST['username'])){
 
-     $username = $_POST['username'];
-     $password = $_POST['username'];
+    $username  = $_POST['username'];
+    $password  = $_POST['password'];
 
-     $api = new apihandler();
-     $login = $api->vendorLogin($username,$password);
-     print_r ($login);
-   }else{
+    $api = new apihandler();
+    $login = $api->vendorLogin($username,$password);
+    print_r ($login);
+  }else{
     $response = json_encode(
-          array(
-             "Message" => "Masih Ada Field Yang Kosong",
-             "Success" => "0",
-             "UserLevel"=> "NULL",
-             "Result"   => array(),
-          ));
+        array(
+            "Message" => "Masih Ada Field Yang Kosong",
+            "Success" => "0",
+            "UserLevel"=> "NULL",
+            "User"   => array(),
+        ));
         echo $response;
-   }
+  }

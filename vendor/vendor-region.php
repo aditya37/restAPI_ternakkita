@@ -18,7 +18,7 @@ include_once("../config/api-handler.php");
 
     // Id region
     $id_region = acak(16);
-    $region = $api->customerRegion($id_region,$data['provinsi'],$data['kabupaten'],$data['kecamatan'],$data['desa'],$data['alamat'],$data['kodepos'],$data['id_login']);
+    $region = $api->vendorRegion($id_region,$data['provinsi'],$data['kabupaten'],$data['kecamatan'],$data['desa'],$data['alamat'],$data['kodepos'],$data['id_login']);
     print_r ($region);
   }else{
     $response = json_encode(array("message" => "Field Kosong","success" => "0","result" => array()));
