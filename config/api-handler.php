@@ -326,6 +326,7 @@ class apihandler extends database{
       }
       return $response;
   }
+
   // insert Product detail [OK]
   public function addProductDetail($id_detailP,$gender,$type,$weight,$price,$description,$note,$age,$image,$idProduct){
 
@@ -434,14 +435,49 @@ class apihandler extends database{
   public function deleteProduct(){}
   // update product
   public function productUpdate(){}
+
   /* ==================================================================
-  *  Transaction Handler
+  *  Transaction [Customer] Handler
   *  ==================================================================
   */
 
-  // Insert Transaction
-  public function addTransaction(){
+  // Insert Transaction [OK]
+  public function addTransaction($idTransaction,$idCustomer,$idProduct,$startTransaction,$endTransaction,$status){
+    $transaksi = $this->koneksi->query("SELECT * FROM tbl_transaction WHERE idProduct='$idProduct'");
+    if($transaksi == false){
+      return false;
+    }
+      if($num_row = $transaksi->num_rows > 0){
+          $response = json_encode(array(
+            "message" => "Product Sudah Masuk List",
+            "success" => "0"
+          ));
+      }else{
+          $addTransaction = $this->koneksi->query("INSERT INTO tbl_transaction VALUES('$idTransaction','$idCustomer','$idProduct','$startTransaction','$endTransaction','$status')");
+          $response = json_encode(array(
+            "message" => "Input Success",
+            "success" => "1"
+          ));
+      }
+    return $response;
+  }
+
+  // Insert Detail Transaction
+  public function detailTransaction(){
 
   }
 
+  // Get Transaction order by idCustomer
+  public function getCustomerTransaction($idCustomer){
+
+  }
+
+  /* ==================================================================
+  *  Transaction [Vendor] Handler
+  *  ==================================================================
+  */
+  // Get Transaction order by idVendor
+  public function getVendorTransaction($idVendor){
+
+  }
 }
