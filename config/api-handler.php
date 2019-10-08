@@ -257,21 +257,21 @@ class apihandler extends database{
   *  ==================================================================
   */
 
-  // Get Product
+  // Get Product [OK]
   public function getallProduct(){
-    $queryProduct = $this->koneksi->query("SELECT
+      $queryProduct = $this->koneksi->query("SELECT
                 tbl_product.idProduct,
                 tbl_product.productTittle,
-                tbl_userData.firstName,
+                tbl_vendorData.firstName,
                 tbl_product.productStatus,
-                tbl_userRegion.administrative_area_level_1,
+                tbl_vendorRegion.administrative_area_level_1,
                 tbl_detailProduct.price,
                 tbl_detailProduct.image
                 FROM tbl_product
                 INNER JOIN tbl_detailProduct USING (idProduct)
-                INNER JOIN tbl_userData USING (id_login)
-                INNER JOIN tbl_userRegion USING (id_login)
-                INNER JOIN tbl_userLogin USING (id_login) WHERE tbl_product.productStatus='Available'");
+                INNER JOIN tbl_vendorData USING (idVendor)
+                INNER JOIN tbl_vendorRegion USING (idVendor)
+                INNER JOIN tbl_vendor USING (idVendor) WHERE tbl_product.productStatus='Available'");
 
       if($queryProduct == false){
         return false;
@@ -304,7 +304,7 @@ class apihandler extends database{
       return json_encode($response);
   }
 
-  // insert Product
+  // insert Product [OK]
   public function addProduct($idProduct,$judul,$dateCreate,$dateUpdate,$status,$idVendor){
     $query = $this->koneksi->query("SELECT * FROM tbl_product WHERE productTittle='$judul'");
 
@@ -326,7 +326,7 @@ class apihandler extends database{
       }
       return $response;
   }
-  // insert Product detail
+  // insert Product detail [OK]
   public function addProductDetail($id_detailP,$gender,$type,$weight,$price,$description,$note,$age,$image,$idProduct){
 
       $query = $this->koneksi->query("SELECT idProduct FROM tbl_product WHERE idProduct='$idProduct'");
@@ -362,7 +362,7 @@ class apihandler extends database{
     return $response;
   }
 
-  /*get Product by ID
+  /*get Product by ID [OK]
   * function ini berfungsi untuk detail product
   */
   public function getProduct($idProduct){
@@ -370,12 +370,12 @@ class apihandler extends database{
     $queryProduct = $this->koneksi->query("SELECT
               tbl_product.idProduct,
           		tbl_product.productTittle,
-          		tbl_userData.firstName,
-              tbl_userData.lastName,
-              tbl_userLogin.id_login,
-              tbl_userData.profilePhoto,
-          		tbl_userRegion.administrative_area_level_1,
-              tbl_userRegion.address,
+          		tbl_vendorData.firstName,
+              tbl_vendorData.lastName,
+              tbl_vendor.idVendor,
+              tbl_vendorData.profilePhoto,
+          		tbl_vendorRegion.administrative_area_level_1,
+              tbl_vendorRegion.address,
           		tbl_detailProduct.price,
           		tbl_detailProduct.image,
               tbl_detailProduct.weight,
@@ -385,9 +385,9 @@ class apihandler extends database{
               tbl_detailProduct.note
               FROM tbl_product
               INNER JOIN tbl_detailProduct USING (idProduct)
-              INNER JOIN tbl_userData USING (id_login)
-              INNER JOIN tbl_userRegion USING (id_login)
-              INNER JOIN tbl_userLogin USING (id_login) WHERE tbl_product.idProduct = '$idProduct'");
+              INNER JOIN tbl_vendorData USING (idVendor)
+              INNER JOIN tbl_vendorRegion USING (idVendor)
+              INNER JOIN tbl_vendor USING (idVendor) WHERE tbl_product.idProduct = '$idProduct'");
 
       if($queryProduct == false){
         return false;
@@ -414,7 +414,7 @@ class apihandler extends database{
               $produk['catatan']     = $data['note'];
               array_push($response['produk']['detail_produk'],$produk);
               // vendor area
-              $vendor['idLogin']     = $data['id_login'];
+              $vendor['idLogin']     = $data['idVendor'];
               $vendor['firstName']   = $data['firstName'];
               $vendor['lastName']    = $data['lastName'];
               $vendor['imgProfile']  = $data['profilePhoto'];
