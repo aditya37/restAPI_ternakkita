@@ -467,11 +467,95 @@ class apihandler extends database{
 
   }
 
-  // Get Transaction order by idCustomer
+  // Get Transaction order by idCustomer [OK]
   public function getCustomerTransaction($idCustomer){
+      $customerTransaction = $this->koneksi->query("SELECT tbl_transaction.idTransaction,
+        tbl_vendorData.firstName,
+        tbl_product.productTittle,
+        tbl_detailProduct.price,
+        tbl_detailProduct.image,
+        tbl_transaction.statusTransaction,
+        tbl_transaction.endTransaction
+        FROM tbl_transaction
+	      INNER JOIN tbl_product USING (idProduct)
+	      INNER JOIN tbl_detailProduct USING (idProduct)
+	      INNER JOIN tbl_vendor USING (idVendor)
+	      INNER JOIN tbl_vendorData USING (idVendor)
+	      INNER JOIN tbl_customer USING (idCustomer) WHERE tbl_customer.idCustomer ='$idCustomer'");
 
+          if($customerTransaction == false){
+            return false;
+          }
+
+          if($num_rows = $customerTransaction->num_rows > 0){
+            $response = array(
+              "success" => "1",
+              "message" => "Load Data Transaksi Berhasil",
+              "transaksi"  => array());
+
+              while($data = $customerTransaction->fetch_array()){
+                $transaksi["nomorTransaction"] = $data['idTransaction'];
+                $transaksi["namaVendor"]       = $data['firstName'];
+                $transaksi["judulProduk"]      = $data['productTittle'];
+                $transaksi["hargaProduk"]      = $data['price'];
+                $transaksi["thumbnailProduct"] = $data['image'];
+                $transaksi["statusTransaction"]= $data['statusTransaction'];
+                $transaksi["tglCash"]          = $data['endTransaction'];
+                array_push($response['transaksi'],$transaksi);
+              }
+
+          }else{
+            $response = array(
+              "success" => "0",
+              "message" => "Riwayat Transaksi Kosong"
+            );
+          }
+    return json_encode($response);
   }
 
+  // Get data product and data customer for insert or add data transaction
+  public function get_data_add_transaction($idProduct,$idCustomer){
+
+    $getData = $this->koneksi->query("SELECT tbl_detailProduct.image,
+              tbl_product.idProduct,
+              tbl_product.productTittle,
+              tbl_customer.idCustomer,
+              tbl_customerData.firstName,
+              tbl_customerRegion.address
+              FROM tbl_transaction
+              INNER JOIN tbl_product USING (idProduct)
+              INNER JOIN tbl_detailProduct USING (idProduct)
+              INNER JOIN tbl_customer USING (idCustomer)
+              INNER JOIN tbl_customerData USING (idCustomer)
+              INNER JOIN tbl_customerRegion USING (idCustomer)
+              WHERE tbl_product.idProduct = '$idProduct' AND tbl_customer.idCustomer = '$idCustomer'");
+
+              if($getData == false){
+                return false;
+              }
+
+              if($num_rows = $getData->num_rows > 0){
+                  $response = array(
+                  "success" => "1",
+                  "message" => "Load Data",
+                  "data"  => array());
+
+                  while ($data = $getData->fetch_array()) {
+                    $h['imageThumbnail'] = $data['image'];
+                    $h['judul_produk']   = $data['productTittle'];
+                    $h['nama_customer']  = $data['firstName'];
+                    $h['alamat_customer']= $data['address'];
+                    array_push($response['data'],$h);
+                  }
+
+              }else{
+                $response = array(
+                  "success" => "0",
+                  "message" => "Ooops!! Data Kosong"
+                );
+              }
+    return json_encode($response);
+  }
   /* ==================================================================
   *  Transaction [Vendor] Handler
   *  ==================================================================
