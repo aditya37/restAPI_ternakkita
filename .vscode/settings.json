@@ -1,0 +1,5 @@
+{
+    "mdb.confirmRunAll": false,
+    "mdb.useDefaultTemplateForPlayground": false,
+    "mongodbLanguageServer.maxNumberOfProblems": 10
+}
